@@ -189,6 +189,13 @@ class PlatformProbe:
             return None
         return body if isinstance(body, dict) else None
 
+    def reading_absent(self, exception_id: str) -> bool:
+        """Return whether the API answers 404: this stack has never stored the reading."""
+        try:
+            return self._api.get(f"/api/v1/exceptions/{exception_id}").status_code == 404
+        except httpx.HTTPError:
+            return False
+
     def readiness_status(self) -> int | None:
         """Return the status code `/health/ready` answers, or None when it does not answer."""
         try:
@@ -232,11 +239,21 @@ class PlatformProbe:
                 moved += 1
 
 
-def baseline_sample(probe: PlatformProbe, exception_ids: list[str]) -> dict[str, Any]:
-    """Measure the four baseline fields once, over the readings the caller knows about."""
+def baseline_sample(
+    probe: PlatformProbe, exception_ids: list[str], *, skip_absent: bool = False
+) -> dict[str, Any]:
+    """Measure the four baseline fields once, over the readings the caller knows about.
+
+    With ``skip_absent``, a reading this stack has never stored (the API answers 404) is not
+    counted: a fresh stack, such as a CI runner or a rebuilt machine, holds none of the
+    readings a committed lab file lists, and they are not pending there. A reading the stack
+    does hold must still be terminal, and a reading the API cannot answer for is not.
+    """
     terminal = True
     for exception_id in exception_ids:
         record = probe.reading_record(exception_id)
+        if record is None and skip_absent and probe.reading_absent(exception_id):
+            continue
         if record is None or record.get("state") not in TERMINAL_STATES:
             terminal = False
     depths = probe.depths()
