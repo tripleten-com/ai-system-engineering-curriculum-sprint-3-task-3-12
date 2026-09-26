@@ -1,0 +1,49 @@
+# Coldline - Task 3.12
+# File: submission-sample.yaml
+# Component: Fictional completed answer sheet
+# Purpose: Show the accepted shape.
+# Interacts With: docs/contracts/submission.schema.json
+# Sprint/Task: Sprint 3 - Project 3 / Task 3.12
+# Concepts: Answer-sheet shape
+# Tools: YAML
+
+# Complete submission.yaml from your own run and the sources named beside each answer group.
+# Keep the supplied keys; replace empty strings, zeros, and empty lists using each field's
+# stated type. Empty values and placeholder text fail verification.
+# Use submission-sample.yaml for format only; do not copy its fictional values.
+# Do not include secrets, personal data, or local absolute paths.
+# This fictional sample is not a result to submit; an exact copy is rejected.
+
+answers:
+  fault_id: "queue_unavailable"
+  why_different: "Fictional: the fault takes the dead-letter queue away rather than the worker, so I expect the alert to fire where the existing entry says it stays silent, and the Recovery section to need a purge instead of a restart."
+  evidence:
+    trace:
+      - reference: "0123456789abcdef0123456789abcdef"
+        observation: "Fictional: the accept span ended in 4 ms and coldline.process_exception started 41 s later, after the fault was lifted."
+    metric:
+      - reference: "coldline_job_queue_dead_letter_depth"
+        observation: "Fictional: the series climbed to 3 twelve seconds into the window and fell back to 0 after the redrive."
+    log:
+      - reference: "2026-09-25T09:14:02.118+00:00 delivery failed exception_id=exc-fictional; leaving it pending"
+        observation: "Fictional: the worker logged the failed delivery with the same trace_id as the cited trace."
+    queue:
+      - reference: "2026-09-25T09:14:03.005+00:00 queue_depth=0 dead_letter_depth=3"
+        observation: "Fictional: three messages had reached the dead-letter queue while the main queue stayed empty."
+  first_affected_component: "dead_letter_queue"
+  detection_signal: "alert"
+  detection_signal_note: "Fictional: ColdlineDeadLetterQueueBacklog went active in Alertmanager 27 s after the fault started, before any queue query showed it."
+  recovery:
+    outcome: "recovered_with_failures"
+    completed_count: 3
+    failed_count: 2
+    failure_reasons:
+      - "processing_attempts_exhausted"
+    redriven_count: 3
+    alert_state: "resolved"
+    baseline:
+      all_readings_terminal: true
+      queue_depth: 0
+      dead_letter_depth: 0
+      readiness_status: 200
+  notes: "Fictional: the four questions held but Detection started from the alert instead of the queue query, and Recovery needed a redrive. I would tell Elena on-call can follow the guide if each entry says what to look at first. My Step 1 expectation about the purge was wrong."

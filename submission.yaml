@@ -1,0 +1,76 @@
+# Coldline - Task 3.12
+# File: submission.yaml
+# Component: Student answer sheet
+# Purpose: Record the catalog fault you ran, the evidence you correlated, the recovery you verified, and your notes.
+# Interacts With: Submission schema, public verifier, fault contract checks, protected answer key
+# Sprint/Task: Sprint 3 - Project 3 / Task 3.12
+# Concepts: Fault variation, detection latency, correlation by id, baseline, runbook
+# Tools: YAML
+
+# Complete submission.yaml from your own run and the sources named beside each answer group.
+# Keep the supplied keys; replace empty strings, zeros, and empty lists using each field's
+# stated type. Empty values and placeholder text fail verification.
+# Use submission-sample.yaml for format only; do not copy its fictional values.
+# Do not include secrets, personal data, or local absolute paths.
+
+answers:
+  # Task 3.12 — Step 1: Choose the fault and say what makes it different
+  # Source: infra/faults/catalog.yaml (one of its two ids, exactly as written, as a string)
+  # and the existing entry in docs/student/runbook.md. why_different: at most 400 characters,
+  # which component your fault takes away and which part of the existing entry you expect
+  # not to transfer. Name components and signals, not feelings.
+  fault_id: ""
+  why_different: ""
+
+  # Task 3.12 — Step 3: Correlate the trace, metric, log and queue evidence
+  # Source: your own lab file (docs/student/faults/<fault_id>-lab.json), Jaeger, Prometheus,
+  # the worker or api logs, and the lab's queue samples, for at least one reading the lab
+  # submitted. One list per kind, at least one entry each:
+  #   trace.reference: a 32-character trace id from the lab file's trace_ids.
+  #   metric.reference: the exact PromQL you ran.
+  #   log.reference: the line's timestamp and message.
+  #   queue.reference: the sample's timestamp and both depths.
+  # observation: what it showed, in plain words.
+  evidence:
+    trace: []
+    metric: []
+    log: []
+    queue: []
+
+  # first_affected_component: api | worker | model_provider | queue | dead_letter_queue
+  #   the component your correlated evidence shows failing first for that reading.
+  # detection_signal: queue_depth | dead_letter_depth | alert | worker_up | trace_error |
+  #   log_error | reading_state: the signal that first showed the fault to someone watching.
+  # detection_signal_note: at most 300 characters, where you saw it and how long after the
+  #   fault started.
+  first_affected_component: ""
+  detection_signal: ""
+  detection_signal_note: ""
+
+  # Task 3.12 — Step 4: Recover, verify by hand, and prove baseline
+  # Source: `curl http://localhost:8000/api/v1/exceptions/<id>` for every exception id in
+  # your lab file, both queue depths, the alert list, and the output of `poe baseline-check`.
+  # outcome: recovered | recovered_with_failures | not_recovered
+  # completed_count, failed_count: whole numbers; together they equal the lab's readings.
+  # failure_reasons: a list of strings, one per FAILED record you read (empty if none).
+  # redriven_count: how many messages you moved with `poe redrive` (0 if none).
+  # alert_state: active | resolved | absent, what Alertmanager showed after recovery.
+  # baseline: copy the four fields `poe baseline-check` printed, not the lab file's block.
+  recovery:
+    outcome: ""
+    completed_count: 0
+    failed_count: 0
+    failure_reasons: []
+    redriven_count: 0
+    alert_state: ""
+    baseline:
+      all_readings_terminal: false
+      queue_depth: 0
+      dead_letter_depth: 0
+      readiness_status: 0
+
+  # Task 3.12 — Step 5: Write the second runbook entry
+  # At most 600 characters: whether the first entry's method held for this fault, which
+  # section changed most, what you would tell Elena about following the runbook for a
+  # failure on-call has not practised, and where your Step 1 expectation was wrong or right.
+  notes: ""

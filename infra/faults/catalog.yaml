@@ -1,0 +1,22 @@
+# Coldline - Task 3.12
+# File: infra/faults/catalog.yaml
+# Component: Fault catalog
+# Purpose: List exactly the faults `poe fault-lab` can run, each with its bounded window.
+# Interacts With: tests/failure/fault_lab.py, tests/contract/fault_contract.py, submission.yaml
+# Sprint/Task: Sprint 3 - Project 3 / Task 3.12
+# Concepts: Bounded fault, blast radius, detection-to-verification runbook
+# Tools: YAML
+
+# The catalog is the whole list. `poe fault-lab --fault <id>` refuses an id that is not
+# here, and answers.fault_id in submission.yaml must be one of these ids, character for
+# character. Each entry has exactly three keys: `id`, one line saying what the fault
+# breaks, and the number of seconds the lab keeps it active before lifting it. The lab
+# applies and lifts the fault itself, inside the worker container, through the supplied
+# controls; nothing here is student-editable.
+faults:
+  - id: provider_outage
+    description: The model provider emulator returns errors for the window, so every summary attempt the worker makes fails and is retried later.
+    duration_seconds: 20
+  - id: queue_unavailable
+    description: The LocalStack SQS endpoint is unreachable from the worker for the window, so accepted readings wait on the queue with no consumer able to receive them.
+    duration_seconds: 20

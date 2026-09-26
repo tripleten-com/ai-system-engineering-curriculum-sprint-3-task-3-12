@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Coldline Task 3.12 public answer contract. The catalog fault the student ran and why it differs from the existing runbook entry, the evidence they correlated for one reading (one entry per kind, cited by trace id, PromQL, log line, or queue sample), the component the evidence showed failing first and the signal that showed it, the recovery outcome with its counts and the baseline fields copied from `poe baseline-check`, and the closing notes. The fault contract checks compare the trace references and the counts with the student's own lab file and the baseline fields with the running stack; the protected check compares the component, the signal, and the recovery fields with the answer key. There is no self-attestation field, no pass boolean, and no recording URL.",
+  "title": "Coldline Task 3.12 answers",
+  "description": "The chosen fault, the correlated evidence, the recovery record, and the notes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answers"],
+  "properties": {
+    "answers": {
+      "description": "The only top-level answer mapping accepted by the public verifier.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fault_id",
+        "why_different",
+        "evidence",
+        "first_affected_component",
+        "detection_signal",
+        "detection_signal_note",
+        "recovery",
+        "notes"
+      ],
+      "properties": {
+        "fault_id": {
+          "description": "The catalog id you ran, exactly as infra/faults/catalog.yaml writes it.",
+          "enum": ["provider_outage", "queue_unavailable"]
+        },
+        "why_different": {
+          "description": "Which component your fault takes away and which part of the existing entry you expect not to transfer, written before you ran anything.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "evidence": {
+          "description": "One list per evidence kind for at least one reading the lab submitted, each item cited by the id, query, or line that lets someone else find it.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["trace", "metric", "log", "queue"],
+          "properties": {
+            "trace": {
+              "description": "Jaeger traces: each reference is a 32-character trace id from your lab file's trace_ids.",
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/trace_evidence"}
+            },
+            "metric": {
+              "description": "Prometheus series: each reference is the exact PromQL you ran.",
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/evidence"}
+            },
+            "log": {
+              "description": "Worker or API log lines: each reference is the line's timestamp and message.",
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/evidence"}
+            },
+            "queue": {
+              "description": "Queue samples: each reference is the sample's timestamp and both depths.",
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/evidence"}
+            }
+          }
+        },
+        "first_affected_component": {
+          "description": "The component your correlated evidence shows failing first for that reading.",
+          "enum": ["api", "worker", "model_provider", "queue", "dead_letter_queue"]
+        },
+        "detection_signal": {
+          "description": "The signal that first showed the fault to someone watching.",
+          "enum": [
+            "queue_depth",
+            "dead_letter_depth",
+            "alert",
+            "worker_up",
+            "trace_error",
+            "log_error",
+            "reading_state"
+          ]
+        },
+        "detection_signal_note": {
+          "description": "Where you saw the signal and how long after the fault started.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "recovery": {
+          "description": "The outcome, the terminal states you fetched, any messages you redrove, the alert state, and the baseline fields copied from `poe baseline-check`.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "outcome",
+            "completed_count",
+            "failed_count",
+            "failure_reasons",
+            "redriven_count",
+            "alert_state",
+            "baseline"
+          ],
+          "properties": {
+            "outcome": {
+              "description": "recovered, recovered_with_failures (baseline holds but a reading ended FAILED), or not_recovered.",
+              "enum": ["recovered", "recovered_with_failures", "not_recovered"]
+            },
+            "completed_count": {
+              "description": "How many of the lab's exception ids you fetched in state COMPLETED.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed_count": {
+              "description": "How many of the lab's exception ids you fetched in state FAILED.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "failure_reasons": {
+              "description": "Every failure_reason you read on a FAILED record; empty if none.",
+              "type": "array",
+              "items": {"type": "string", "minLength": 1}
+            },
+            "redriven_count": {
+              "description": "How many dead-lettered messages you moved with `poe redrive`; 0 if the dead-letter queue was already empty.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "alert_state": {
+              "description": "What Alertmanager listed for ColdlineDeadLetterQueueBacklog after recovery; absent means it listed no such alert.",
+              "enum": ["active", "resolved", "absent"]
+            },
+            "baseline": {
+              "description": "The four fields exactly as `poe baseline-check` printed them.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "all_readings_terminal",
+                "queue_depth",
+                "dead_letter_depth",
+                "readiness_status"
+              ],
+              "properties": {
+                "all_readings_terminal": {
+                  "description": "Whether every reading the check knows about is terminal.",
+                  "type": "boolean"
+                },
+                "queue_depth": {
+                  "description": "The main queue's ApproximateNumberOfMessages.",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "dead_letter_depth": {
+                  "description": "The dead-letter queue's ApproximateNumberOfMessages.",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "readiness_status": {
+                  "description": "The HTTP status /health/ready answered.",
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "notes": {
+          "description": "Whether the first entry's method held, which section changed most, what you would tell Elena, and where your Step 1 expectation was wrong.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "observation"],
+      "properties": {
+        "reference": {
+          "description": "The id, exact query, or line that lets someone else find this evidence.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "observation": {
+          "description": "What it showed, in plain words.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        }
+      }
+    },
+    "trace_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "observation"],
+      "properties": {
+        "reference": {
+          "description": "A 32-character lowercase hexadecimal Jaeger trace id from your lab file's trace_ids.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "observation": {
+          "description": "What the spans showed: which one failed, how long it took, how many deliveries appear.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        }
+      }
+    }
+  }
+}
