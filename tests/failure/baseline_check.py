@@ -13,7 +13,9 @@ Tools:             Python 3.12, boto3, httpx
 ``poe baseline-check`` is the independent proof of recovery: it does not read the lab
 file's own ``baseline`` block, it measures the platform again. The readings it knows about
 are the exception ids listed in every lab file under ``docs/student/faults/``; with no lab
-file there are none, and the field holds vacuously. It samples the four fields once a second
+file there are none, and the field holds vacuously. A listed reading this stack has never
+stored (a fresh stack, as on a CI runner) is not counted; one it holds must be terminal.
+It samples the four fields once a second
 for a short settle window, prints the last sample as one JSON object on standard output, and
 exits 0 only when that sample is baseline: every known reading terminal, both queues at
 zero, and readiness 200.
@@ -78,7 +80,7 @@ def main() -> int:
     try:
         deadline = time.monotonic() + SETTLE_SECONDS
         while True:
-            sample = baseline_sample(probe, exception_ids)
+            sample = baseline_sample(probe, exception_ids, skip_absent=True)
             if at_baseline(sample) or time.monotonic() >= deadline:
                 break
             print(

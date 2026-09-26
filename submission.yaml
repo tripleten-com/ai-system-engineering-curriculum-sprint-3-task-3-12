@@ -30,7 +30,7 @@ answers:
   #   metric.reference: the exact PromQL you ran.
   #   log.reference: the line's timestamp and message.
   #   queue.reference: the sample's timestamp and both depths.
-  # observation: what it showed, in plain words.
+  # observation: what it showed, in plain words. Each reference and observation is at most 600 characters.
   evidence:
     trace: []
     metric: []
