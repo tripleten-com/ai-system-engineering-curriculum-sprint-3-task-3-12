@@ -39,18 +39,19 @@ def _entry(reference: str, observation: str = "What it showed.") -> dict[str, st
 
 def _recovery(**overrides: Any) -> dict[str, Any]:
     """Return one well-formed recovery block."""
+    # Fictional format example: these values show the shape and state no result.
     block: dict[str, Any] = {
-        "outcome": "recovered",
-        "completed_count": 5,
-        "failed_count": 0,
-        "failure_reasons": [],
-        "redriven_count": 0,
+        "outcome": "not_recovered",
+        "completed_count": 2,
+        "failed_count": 3,
+        "failure_reasons": ["processing_attempts_exhausted"],
+        "redriven_count": 1,
         "alert_state": "resolved",
         "baseline": {
-            "all_readings_terminal": True,
-            "queue_depth": 0,
-            "dead_letter_depth": 0,
-            "readiness_status": 200,
+            "all_readings_terminal": False,
+            "queue_depth": 4,
+            "dead_letter_depth": 1,
+            "readiness_status": 503,
         },
     }
     block.update(overrides)
@@ -61,18 +62,18 @@ def valid_answers(**overrides: Any) -> dict[str, object]:
     """Return a complete answer sheet in the published shape."""
     answers: dict[str, Any] = {
         "fault_id": "provider_outage",
-        "why_different": "The provider, not the worker, goes away; the queue query stays flat.",
+        "why_different": "Fictional format example; it states no expectation about the fault.",
         "evidence": {
-            "trace": [_entry(TRACE, "Two summarize spans in error, then one that completed.")],
+            "trace": [_entry(TRACE)],
             "metric": [_entry("coldline_exception_jobs_total", "Flat for the whole window.")],
             "log": [_entry("2026-09-25T09:14:02+00:00 processed exception_id=exc-1 RETRY")],
             "queue": [_entry("09:14:03 queue_depth=0 in_flight=5 dead_letter_depth=0")],
         },
         "first_affected_component": "api",
         "detection_signal": "alert",
-        "detection_signal_note": "Jaeger showed the first error span about 6 s after the fault.",
+        "detection_signal_note": "Fictional format example; it names no real signal.",
         "recovery": _recovery(),
-        "notes": "The method held; Detection changed most. On-call can follow it.",
+        "notes": "Fictional format example; it states no conclusion about the runbook.",
     }
     answers.update(overrides)
     return {"answers": answers}
@@ -178,7 +179,7 @@ def test_evidence_outside_the_published_contract_is_rejected(
         ({"redriven_count": 1.5}, "recovery.redriven_count"),
         ({"alert_state": "firing"}, "recovery.alert_state"),
         (
-            {"baseline": {"all_readings_terminal": "yes", "queue_depth": 0}},
+            {"baseline": {"all_readings_terminal": "yes", "queue_depth": 4}},
             "recovery.baseline",
         ),
     ],
