@@ -81,7 +81,7 @@ runbook entry.
 | `poe fault-checks` | The assessed checks: the lab file for your chosen fault is as the lab wrote it and reports baseline, your evidence cites its trace ids, your counts cover its readings, the first runbook entry is unchanged and a second one names your fault with its four sections, and `poe baseline-check` passes against the running stack and matches the baseline fields you recorded |
 | `poe fault-runbook-contract` | `poe answers` and `poe fault-checks` together; the check `poe verify` runs for this Task. It does not rerun the fault |
 | `poe verify` | The public student verification path: it starts the stack, ingests the corpus, runs `poe fault-runbook-contract`, then the smoke tests, the end-to-end workflow, and the supplied student tests |
-| `poe redrive` | Task 3.3's redrive, and the command Step 4 names: move one dead-lettered message back to the main queue and wait for it to complete |
+| `poe redrive` | Task 3.3's redrive, and the command Step 4 names: move every dead-lettered message back to the main queue, wait for each to complete, then deliver the most recently sent one once more and confirm its completed record is unchanged; older ones are listed under `also_redriven` |
 | `poe queue-contract`, `poe slo-contract`, `poe gate-contract`, `poe fidelity-check` | The inherited Task 3.3 through 3.6 checks over the settled checkpoint; still runnable, not part of this Task's verify path. Task 3.6's one-entry runbook structure check is retired here, because the finished runbook holds two entries |
 | `poe contract` | Check interfaces, boundaries, submissions, and repository structure |
 | `poe smoke` | Check the initialized running platform |
