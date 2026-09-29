@@ -53,7 +53,8 @@ answers:
   # outcome: recovered | recovered_with_failures | not_recovered
   # completed_count, failed_count: whole numbers; together they equal the lab's readings.
   # failure_reasons: a list of strings, one per FAILED record you read (empty if none).
-  # redriven_count: how many messages you moved with `poe redrive` (0 if none).
+  # redriven_count: how many dead-lettered messages you moved, which is the dead-letter
+  #   depth just before `poe redrive`, not the number of distinct ids it prints (0 if none).
   # alert_state: active | resolved | absent, what Alertmanager showed after recovery.
   # baseline: copy the four fields `poe baseline-check` printed, not the lab file's block.
   recovery:

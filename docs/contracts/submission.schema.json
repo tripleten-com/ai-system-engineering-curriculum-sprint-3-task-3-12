@@ -120,7 +120,7 @@
               "items": {"type": "string", "minLength": 1}
             },
             "redriven_count": {
-              "description": "How many dead-lettered messages you moved with `poe redrive`; 0 if the dead-letter queue was already empty.",
+              "description": "How many dead-lettered messages you moved with `poe redrive`: the dead-letter queue depth just before the redrive, not the number of distinct exception ids it prints; 0 if the dead-letter queue was already empty.",
               "type": "integer",
               "minimum": 0
             },
