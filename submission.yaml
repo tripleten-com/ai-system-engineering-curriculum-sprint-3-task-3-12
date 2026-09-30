@@ -19,8 +19,13 @@ answers:
   # and the existing entry in docs/student/runbook.md. why_different: at most 400 characters,
   # which component your fault takes away and which part of the existing entry you expect
   # not to transfer. Name components and signals, not feelings.
-  fault_id: ""
-  why_different: ""
+  fault_id: "provider_outage"
+  why_different: >-
+    It takes away the model provider emulator, not the worker container. The worker keeps
+    running, so up{job="coldline-worker"} stays 1 and the depth gauges keep scraping: the first
+    entry's scrape gap and its "growing queue_depth with 0 in flight" absent-consumer signature
+    should not transfer. I expect in-flight messages, PROCESSING records and redelivery instead
+    of a worker restart.
 
   # Task 3.12 — Step 3: Correlate the trace, metric, log and queue evidence
   # Source: your own lab file (docs/student/faults/<fault_id>-lab.json), Jaeger, Prometheus,
@@ -32,10 +37,69 @@ answers:
   #   queue.reference: the sample's timestamp and both depths.
   # observation: what it showed, in plain words. Each reference and observation is at most 600 characters.
   evidence:
-    trace: []
-    metric: []
-    log: []
-    queue: []
+    trace:
+      - reference: "f59f9727dfdb5badf54fa94578344f05"
+        observation: >-
+          Worker trace for exc-d50f684e-abe9-5ad8-84fa-db8373ee4414. Its first
+          coldline.process_exception span (coldline.delivery_count=1, 02:41:51.449Z, 122 ms) holds
+          two model_provider.summarize child spans, both otel.status_code=ERROR with
+          coldline.provider_fault=provider_outage and a RetryableProviderError event (8.1 ms, then
+          0.7 ms): the resilient wrapper spent its whole attempt budget. The same trace holds a
+          second
+          coldline.process_exception with coldline.delivery_count=2 at 02:42:21.854Z, 30.4 s later,
+          whose model_provider.summarize succeeded in 250.5 ms with no error tag.
+    metric:
+      - reference: "coldline_job_queue_pending_messages"
+        observation: >-
+          The worker's own in-flight gauge, queried instant during the window and as a range over
+          02:41:30Z-02:43:00Z at 5 s step. 0 up to 02:41:50Z, then 2 at 02:41:55Z, 4 at 02:42:00Z,
+          5 from 02:42:05Z through 02:42:20Z, then 4, 2, 0 at 02:42:25/30/35Z. This is the in-flight
+          count, not the backlog: the five readings were held by a worker whose provider call kept
+          failing, not waiting for a consumer.
+      - reference: "coldline_job_queue_stream_length"
+        observation: >-
+          Flat 0 at every 5 s point from 02:41:30Z to 02:43:00Z. The waiting backlog
+          (ApproximateNumberOfMessages) never grew, so the first runbook entry's detection query
+          would have shown nothing at all for this fault.
+      - reference: "up{job=\"coldline-worker\"}"
+        observation: >-
+          1 at every 5 s point from 02:41:30Z to 02:43:00Z, instance worker:9100. No scrape gap and
+          no zero: unlike the first entry's consumer outage, the worker stayed up and kept
+          publishing throughout, so its absence was never the signal.
+      - reference: "coldline_job_queue_dead_letter_depth"
+        observation: >-
+          Flat 0 across the whole window and recovery, so ColdlineDeadLetterQueueBacklog had
+          nothing to fire on. Two deliveries per message is well inside the redrive policy, so
+          nothing was dead-lettered.
+    log:
+      - reference: >-
+          timestamp 2026-09-30T02:41:51.571214+00:00, message "processed
+          exception_id=exc-d50f684e-abe9-5ad8-84fa-db8373ee4414 disposition=RETRY" (service
+          coldline-worker, trace_id f59f9727dfdb5badf54fa94578344f05, level INFO)
+        observation: >-
+          The first evidence of the fault anywhere, 0.16 s after the lab applied it at
+          02:41:51.412Z. disposition=RETRY means the worker gave the delivery back for SQS to
+          redeliver instead of acknowledging it. Its trace_id is the trace cited above. The line is
+          logged at INFO, so an on-call engineer filtering on level=ERROR would miss it.
+      - reference: >-
+          timestamp 2026-09-30T02:42:22.126335+00:00, message "processed
+          exception_id=exc-d50f684e-abe9-5ad8-84fa-db8373ee4414 disposition=ACK" (service
+          coldline-worker, trace_id f59f9727dfdb5badf54fa94578344f05)
+        observation: >-
+          The same exception id and the same trace_id, 30.55 s after the RETRY line and 7.4 s after
+          the fault was lifted at 02:42:14.704Z. disposition=ACK is the redelivered attempt
+          succeeding; the record reached COMPLETED at 02:42:22.822Z.
+    queue:
+      - reference: >-
+          lab queue_samples entry at 2026-09-30T02:42:00.341+00:00, phase window: queue_depth=0,
+          in_flight=5, dead_letter_depth=0
+        observation: >-
+          Taken 8.9 s into the window, while exc-d50f684e-abe9-5ad8-84fa-db8373ee4414 was invisible
+          between its RETRY at 02:41:51.571Z and its redelivery at 02:42:21.854Z. All five readings
+          sat in flight with an empty waiting backlog and an empty dead-letter queue: the reading
+          never passed through the dead-letter queue. My own host-side sample at 02:41:59.850Z
+          agreed (queue_depth 0, in_flight 4, dead_letter_depth 0), and the recovery samples drain
+          in_flight 5 -> 0 by 02:42:32.938Z.
 
   # first_affected_component: api | worker | model_provider | queue | dead_letter_queue
   #   the component your correlated evidence shows failing first for that reading.
@@ -43,9 +107,12 @@ answers:
   #   log_error | reading_state: the signal that first showed the fault to someone watching.
   # detection_signal_note: at most 300 characters, where you saw it and how long after the
   #   fault started.
-  first_affected_component: ""
-  detection_signal: ""
-  detection_signal_note: ""
+  first_affected_component: "model_provider"
+  detection_signal: "log_error"
+  detection_signal_note: >-
+    Worker log, `docker compose logs worker`: "processed exception_id=exc-d50f684e...
+    disposition=RETRY" at 02:41:51.571Z, 0.16 s after the fault was applied at 02:41:51.412Z. No
+    queue depth, metric or alert query showed anything at that moment.
 
   # Task 3.12 — Step 4: Recover, verify by hand, and prove baseline
   # Source: `curl http://localhost:8000/api/v1/exceptions/<id>` for every exception id in
@@ -58,20 +125,27 @@ answers:
   # alert_state: active | resolved | absent, what Alertmanager showed after recovery.
   # baseline: copy the four fields `poe baseline-check` printed, not the lab file's block.
   recovery:
-    outcome: ""
-    completed_count: 0
+    outcome: "recovered"
+    completed_count: 5
     failed_count: 0
     failure_reasons: []
     redriven_count: 0
-    alert_state: ""
+    alert_state: "absent"
     baseline:
-      all_readings_terminal: false
+      all_readings_terminal: true
       queue_depth: 0
       dead_letter_depth: 0
-      readiness_status: 0
+      readiness_status: 200
 
   # Task 3.12 — Step 5: Write the second runbook entry
   # At most 600 characters: whether the first entry's method held for this fault, which
   # section changed most, what you would tell Elena about following the runbook for a
   # failure on-call has not practised, and where your Step 1 expectation was wrong or right.
-  notes: ""
+  notes: >-
+    The method held; every answer changed. Detection changed most: the first entry's own query,
+    ApproximateNumberOfMessages, read 0 all window, because the backlog was in flight, not waiting.
+    My Step 1 expectation was right that the worker stays up, so no scrape gap and up stays 1; it
+    was wrong that records would show PROCESSING - they stayed QUEUED, so from the API this looks
+    like a slow queue. Tell Elena: on-call can follow the four questions for an unpractised
+    failure, but not the first entry's first query. Start at the worker log, then in-flight, not
+    queue depth.

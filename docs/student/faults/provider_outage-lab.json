@@ -1,0 +1,237 @@
+{
+  "alert": {
+    "after_recovery": "absent",
+    "during_window": "absent",
+    "name": "ColdlineDeadLetterQueueBacklog"
+  },
+  "baseline": {
+    "all_readings_terminal": true,
+    "dead_letter_depth": 0,
+    "queue_depth": 0,
+    "readiness_status": 200
+  },
+  "digest": "sha256:915945cd5f85e4d4d4b386011f77bc0c7be2bc77d1ae296a464038e70c58589c",
+  "duration_seconds": 20.0,
+  "fault": "provider_outage",
+  "generator": "poe fault-lab",
+  "queue_samples": [
+    {
+      "at": "2026-09-30T02:41:52.481+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 2,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:41:55.095+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 3,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:41:57.714+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 4,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:00.341+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:03.030+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:05.626+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:08.240+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:10.821+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "window",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:14.729+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:16.758+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:18.794+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:20.818+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 5,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:22.844+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 4,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:24.875+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 3,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:26.895+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 2,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:28.913+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 1,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:30.925+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 1,
+      "phase": "recovery",
+      "queue_depth": 0
+    },
+    {
+      "at": "2026-09-30T02:42:32.938+00:00",
+      "dead_letter_depth": 0,
+      "in_flight": 0,
+      "phase": "recovery",
+      "queue_depth": 0
+    }
+  ],
+  "readings": [
+    {
+      "exception_id": "exc-d50f684e-abe9-5ad8-84fa-db8373ee4414",
+      "failure_reason": null,
+      "reading_id": "reading-fault-lab-9d798b495d02",
+      "state": "COMPLETED",
+      "state_during_window": "QUEUED",
+      "submitted_at": "2026-09-30T02:41:51.412+00:00",
+      "terminal_at": "2026-09-30T02:42:22.822+00:00"
+    },
+    {
+      "exception_id": "exc-269d1f1a-c857-5227-ab26-6309c35df02e",
+      "failure_reason": null,
+      "reading_id": "reading-fault-lab-a82ea20c020a",
+      "state": "COMPLETED",
+      "state_during_window": "QUEUED",
+      "submitted_at": "2026-09-30T02:41:52.444+00:00",
+      "terminal_at": "2026-09-30T02:42:24.850+00:00"
+    },
+    {
+      "exception_id": "exc-c50b8958-dfc9-5c5e-abc0-b6ac2f1fa4b1",
+      "failure_reason": null,
+      "reading_id": "reading-fault-lab-7840c8f5fdf5",
+      "state": "COMPLETED",
+      "state_during_window": "QUEUED",
+      "submitted_at": "2026-09-30T02:41:55.071+00:00",
+      "terminal_at": "2026-09-30T02:42:26.880+00:00"
+    },
+    {
+      "exception_id": "exc-d45b710a-a4d4-5aa4-a4d2-1090c983b91c",
+      "failure_reason": null,
+      "reading_id": "reading-fault-lab-bf1ac891af8d",
+      "state": "COMPLETED",
+      "state_during_window": "QUEUED",
+      "submitted_at": "2026-09-30T02:41:57.680+00:00",
+      "terminal_at": "2026-09-30T02:42:28.903+00:00"
+    },
+    {
+      "exception_id": "exc-741adc18-8a01-5b6b-a70f-b0ce43f641c4",
+      "failure_reason": null,
+      "reading_id": "reading-fault-lab-c82f611b788b",
+      "state": "COMPLETED",
+      "state_during_window": "QUEUED",
+      "submitted_at": "2026-09-30T02:42:00.281+00:00",
+      "terminal_at": "2026-09-30T02:42:32.930+00:00"
+    }
+  ],
+  "recorded_at": "2026-09-30T02:42:47.352+00:00",
+  "redriven_count": 0,
+  "returned_to_baseline": true,
+  "schema": "coldline-fault-lab/1",
+  "timeline": {
+    "fault_applied_at": "2026-09-30T02:41:51.412+00:00",
+    "fault_lifted_at": "2026-09-30T02:42:14.704+00:00",
+    "recovered_at": "2026-09-30T02:42:32.938+00:00",
+    "recovery_seconds": 18.2,
+    "window_seconds": 23.3
+  },
+  "trace_ids": [
+    "f59f9727dfdb5badf54fa94578344f05",
+    "a3e75c07b290c993c453c9e3b47153f0",
+    "b99aba3a4613bcbdff5d2de6fa518aa4",
+    "74bab1858a55be6b700b812e6d9c6792",
+    "c8a23713b027d295f72f125e31a99825"
+  ],
+  "traces": [
+    {
+      "exception_id": "exc-d50f684e-abe9-5ad8-84fa-db8373ee4414",
+      "jaeger_url": "http://localhost:16686/trace/f59f9727dfdb5badf54fa94578344f05",
+      "trace_id": "f59f9727dfdb5badf54fa94578344f05"
+    },
+    {
+      "exception_id": "exc-269d1f1a-c857-5227-ab26-6309c35df02e",
+      "jaeger_url": "http://localhost:16686/trace/a3e75c07b290c993c453c9e3b47153f0",
+      "trace_id": "a3e75c07b290c993c453c9e3b47153f0"
+    },
+    {
+      "exception_id": "exc-c50b8958-dfc9-5c5e-abc0-b6ac2f1fa4b1",
+      "jaeger_url": "http://localhost:16686/trace/b99aba3a4613bcbdff5d2de6fa518aa4",
+      "trace_id": "b99aba3a4613bcbdff5d2de6fa518aa4"
+    },
+    {
+      "exception_id": "exc-d45b710a-a4d4-5aa4-a4d2-1090c983b91c",
+      "jaeger_url": "http://localhost:16686/trace/74bab1858a55be6b700b812e6d9c6792",
+      "trace_id": "74bab1858a55be6b700b812e6d9c6792"
+    },
+    {
+      "exception_id": "exc-741adc18-8a01-5b6b-a70f-b0ce43f641c4",
+      "jaeger_url": "http://localhost:16686/trace/c8a23713b027d295f72f125e31a99825",
+      "trace_id": "c8a23713b027d295f72f125e31a99825"
+    }
+  ]
+}
